@@ -2,7 +2,10 @@ name: axios-pay
 region: nyc
 services:
   - name: api
-    dockerfile_path: apps/api/Dockerfile
+    source_dir: /
+    environment_slug: node-js
+    build_command: pnpm install --frozen-lockfile && pnpm --filter @axios-pay/api prisma:generate && pnpm turbo run build --filter=@axios-pay/api
+    run_command: cd apps/api && npx prisma migrate deploy && node dist/index.js
     github:
       repo: your-org/axios-pay
       branch: main
