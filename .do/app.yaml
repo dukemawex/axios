@@ -1,0 +1,98 @@
+name: axios-pay
+region: nyc
+services:
+  - name: api
+    dockerfile_path: apps/api/Dockerfile
+    github:
+      repo: your-org/axios-pay
+      branch: main
+      deploy_on_push: true
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 3001
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+      - key: REDIS_URL
+        scope: RUN_TIME
+        value: ${redis.REDIS_URL}
+      - key: JWT_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: JWT_REFRESH_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: JWT_EXPIRES_IN
+        scope: RUN_TIME
+        value: "15m"
+      - key: JWT_REFRESH_EXPIRES_IN
+        scope: RUN_TIME
+        value: "7d"
+      - key: INTERSWITCH_CLIENT_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: INTERSWITCH_CLIENT_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: INTERSWITCH_BASE_URL
+        scope: RUN_TIME
+        value: "https://sandbox.interswitchng.com"
+      - key: INTERSWITCH_MERCHANT_CODE
+        scope: RUN_TIME
+        type: SECRET
+      - key: INTERSWITCH_PAY_ITEM_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: INTERSWITCH_WEBHOOK_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: SMTP_HOST
+        scope: RUN_TIME
+        type: SECRET
+      - key: SMTP_PORT
+        scope: RUN_TIME
+        value: "587"
+      - key: SMTP_USER
+        scope: RUN_TIME
+        type: SECRET
+      - key: SMTP_PASS
+        scope: RUN_TIME
+        type: SECRET
+      - key: TWILIO_SID
+        scope: RUN_TIME
+        type: SECRET
+      - key: TWILIO_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+      - key: TWILIO_FROM
+        scope: RUN_TIME
+        type: SECRET
+      - key: NODE_ENV
+        scope: RUN_TIME
+        value: "production"
+      - key: PORT
+        scope: RUN_TIME
+        value: "3001"
+
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    size: db-s-1vcpu-1gb
+    num_nodes: 1
+    production: false
+
+  - name: redis
+    engine: REDIS
+    version: "7"
+    size: db-s-1vcpu-1gb
+    num_nodes: 1
+    eviction_policy: allkeys-lru
