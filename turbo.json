@@ -1,0 +1,34 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "DATABASE_URL",
+    "REDIS_URL",
+    "JWT_SECRET",
+    "JWT_REFRESH_SECRET",
+    "INTERSWITCH_CLIENT_ID",
+    "INTERSWITCH_CLIENT_SECRET",
+    "INTERSWITCH_BASE_URL",
+    "NEXT_PUBLIC_API_URL"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": ["coverage/**"]
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Currency {
+  NGN
+  UGX
+  KES
+  GHS
+  ZAR
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum TransactionType {
+  SWAP
+  DEPOSIT
+  WITHDRAWAL
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  phone         String?       @unique
+  firstName     String
+  lastName      String
+  passwordHash  String
+  emailVerified Boolean       @default(false)
+  phoneVerified Boolean       @default(false)
+  emailOtp      String?
+  phoneOtp      String?
+  otpExpiry     DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  wallets       Wallet[]
+  transactions  Transaction[]
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String
+  currency  Currency
+  balance   Decimal  @default(0) @db.Decimal(20, 8)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, currency])
+}
+
+model Transaction {
+  id             String            @id @default(cuid())
+  userId         String
+  type           TransactionType
+  status         TransactionStatus @default(PENDING)
+  fromCurrency   Currency?
+  toCurrency     Currency?
+  fromAmount     Decimal?          @db.Decimal(20, 8)
+  toAmount       Decimal?          @db.Decimal(20, 8)
+  fee            Decimal?          @db.Decimal(20, 8)
+  rate           Decimal?          @db.Decimal(20, 8)
+  reference      String            @unique @default(cuid())
+  interswitchRef String?
+  metadata       Json?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  user           User              @relation(fields: [userId], references: [id])
+}
+
+model ExchangeRate {
+  id           String   @id @default(cuid())
+  fromCurrency Currency
+  toCurrency   Currency
+  rate         Decimal  @db.Decimal(20, 8)
+  updatedAt    DateTime @updatedAt
+
+  @@unique([fromCurrency, toCurrency])
+}
