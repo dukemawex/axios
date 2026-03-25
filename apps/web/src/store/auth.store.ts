@@ -38,11 +38,11 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== 'undefined') {
           return localStorage;
         }
-        // SSR-safe noop storage
+        // SSR-safe noop storage — returns correct types for JSONStorage interface
         return {
-          getItem: () => null,
-          setItem: () => undefined,
-          removeItem: () => undefined,
+          getItem: (_name: string): string | null => null,
+          setItem: (_name: string, _value: string): void => undefined,
+          removeItem: (_name: string): void => undefined,
         };
       }),
       onRehydrateStorage: () => (state) => {
